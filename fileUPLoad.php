@@ -7,8 +7,6 @@
 ====================.============================== -->
 <?php /*//////////////////////////////////////////////////*/ ?>
 
-<script src="../JQuery.js" type="text/javascript"></script>
-
 
 <?php /*//////////////////////////////////////////////////*/ ?>
 </head><body>
@@ -19,24 +17,19 @@
 
 <style type="text/css">
 .blue {
+	display: block;
+	width: 200px;
 	height: 42px;
 	margin: 0;
-	padding: 0 16px;
 	background: #03a9f4;
-	border: 0;
-	border-bottom: 2px solid #b0bec5;
-	border-radius: 2px 2px 0 0;
+	border: 1px dashed gray;
+	border-radius: 7px;
 	font-size: 18px;
 	line-height: 42px;
 	color: #fff;
 	font-weight: 400;
 	text-align: center;
 }
-</style>
-
-<input type="button" value="開始" class="blue" />
-
-<style>
 .pika {
 	width: 200px;
 	height: 100px;
@@ -103,105 +96,134 @@
 }
 </style>
 
+<label for="selectFile" class="blue">選擇圖片</label>
 <div class="pika">
-	<input type="file" multiple accept="image/*" />
+	<input type="file" id="selectFile" multiple accept="image/*" />
 </div>
 
 <br />
 
 <div id="fileDropBox">
 	<div class="textarea">
-		<textarea id="txt"></textarea>
+		<textarea></textarea>
 	</div>
 </div>
 
 
 <script type="text/javascript">
-	$('.textarea > textarea').on({
-		focusin:function(){ $(this).parent().addClass('InputFocus');},
-		focusout:function(){ $(this).parent().removeClass('InputFocus');}
-	});
+	var helTextarea = document.querySelector('.textarea > textarea');
 
-	var DDBox={};
+	void function () {
+		function textareaFocusToggle() {
+			var helParent = this.parentNode;
+			if (this === document.activeElement) {
+				helParent.classList.add('InputFocus');
+			} else {
+				helParent.classList.remove('InputFocus');
+			};
+		}
+
+		helTextarea.addEventListener('focusin', textareaFocusToggle, false);
+		helTextarea.addEventListener('focusout', textareaFocusToggle, false);
+	}();
+
+	function msgText(msg) {
+		switch (typeof msg) {
+			case 'string':
+				msgText.add(msg);
+				break;
+			case 'object':
+				if (msg.constructor !== Array) break;
+				for (let val of msg) msgText.add(val);
+				break;
+		}
+
+		return msgText;
+	}
+
+	msgText._text = '';
+	msgText._helTextarea = helTextarea;
+	msgText.add = function (msg) {
+		var txt = this._text;
+		this._text = (!txt ? '' : txt + '\n') + msg
+	};
+	msgText.clear = function (msg) {
+		this._helTextarea.innerText = this._text = '';
+		if (!!msg) msgText(msg);
+		return this;
+	};
+	msgText.output = function () {
+		var txt = this._text;
+		if (!!txt) {
+			this._helTextarea.innerText = txt;
+			this._text = '';
+		}
+		return this;
+	};
 
 	if (!window.FileReader){
-		var message = '<p>HTML5 ' +
-			'<a href="http://dev.w3.org/2006/webapi/FileAPI/" target="_blank">File API</a> ' +
-			' 不被您的瀏覽器支援，請升級瀏覽器到最新版本。。</p>';
+		var message = '<p>HTML5' +
+			' <a href="http://dev.w3.org/2006/webapi/FileAPI/" target="_blank">File API</a>' +
+			' 不被您的瀏覽器支援，請升級瀏覽器到最新版本。</p>';
 		document.querySelector('body').innerHTML = message;
 	}else{
-		// Set up the file drag and drop listeners:
 		document.getElementById('fileDropBox').addEventListener('dragover', handleDragOver, false);
 		document.getElementById('fileDropBox').addEventListener('drop', handleFileSelection, false);
 	}
 
 	function handleDragOver(evt){
-		evt.stopPropagation();  // Do not allow the dragover event to bubble.
-		evt.preventDefault(); // Prevent default dragover event behavior.
+		// 取消冒泡
+		evt.stopPropagation();
+		// 防止預設動作
+		evt.preventDefault();
 	}
 
-
 	function handleFileSelection(evt){
-		evt.stopPropagation(); // Do not allow the drop event to bubble.
-		evt.preventDefault(); // Prevent default drop event behavior.
+		evt.stopPropagation();
+		evt.preventDefault();
 
 		// 獲取移到拖曳框的檔案列表
 		var files = evt.dataTransfer.files;
 
 		if (!files){
-			msa.alert("<p>At least one selected file is invalid - do not select any folders.</p><p>Please reselect and try again.</p>");
+			msgText.clear('<p>至少有一個選定的文件無效 - 請勿選擇任何文件夾。</p><p>請重新選擇。</p>').output();
 			return;
 		}
 
 		// "files" 是選取檔案的數組。
 		// 顯示檔案的屬性。
-		var output = [];
-		for (var i = 0, f; i < files.length; i++){
+		msgText.clear();
+		for (let val of files){
 			try {
-				f = files[i];
-				output.push(f.name, f.type || 'unknown file type', ') - ', f.size, ' bytes, \nlast modified: ', f.lastModifiedDate);
-				document.getElementById('txt').innerHTML = output.join(' ');
-				} // try
-			catch (fileError) {
-				msa.alert( "<p>錯誤！檔案未被指定。</p><p>選擇資料夾會導致錯誤發生。</p>" ) ;
-				console.log( "找到下列的錯誤 i = " + i + ": " + fileError ) ;
-				// 傳送錯誤訊息到瀏覽器的 debugger。
-				return;
+				msgText([
+					val.name + ' (' + (val.type || 'unknown file type') + ') - ' + val.size + ' bytes',
+					'last modified: ' + val.lastModifiedDate
+				]);
+			}
+			catch (err) {
+				msgText.clear('<p>錯誤！檔案未被指定。</p><p>選擇資料夾會導致錯誤發生。</p>');
+				console.log('文件清單讀值錯誤', val.name, fileError);
+				break;
 			}
 		}
+		msgText.output();
 	}
-</script>
 
-<script type="text/javascript">
-function aa() {
-	var file = document.getElementById('ff').files[0];
-	//console.dir(file);
-	if (file) {
-		var msg = [];
-		msg.push('檔名：' + file.name
-			, '大小：' + file.size
-			, '檔案類型：' + file.type
-			, '修改日期：' + file.lastModifiedDate.toLocaleDateString()
-			);
-		document.getElementById('msg').innerHTML = msg.join("<"+"br"+">");
+	document.querySelector('.pika > input').addEventListener('change', selectFile, false);
 
-		//讀取檔案
-		var fileReader = new FileReader();
-		fileReader.onload = function(event){//讀取完後執行的動作
-			//console.dir(event);
-			//document.getElementById('ms').innerHTML = event.target.result;
-			//alert( event.target.result.constructor + '\n' + event.target.length + '\n' + event.target.result.length )
-			//document.getElementById('xx').src = event.target.result;
-			var jEXIF = event.target.exifLoad(function(){
-				alert('1 => ' + event.target.exif( 'PixelXDimension' ) + '\n' + event.target.result + '\n' + jEXIF );
-			});
+	function selectFile() {
+		var file = this.files[0];
+		//console.dir(file);
+		msgText.clear();
+		if (file) {
+			msgText([
+				'檔名：' + file.name,
+				'大小：' + file.size,
+				'檔案類型：' + file.type,
+				'修改日期：' + file.lastModifiedDate.toLocaleDateString(),
+			]);
 		}
-		//fileReader.readAsDataURL(file);//讀取檔案內容,以DataURL格式回傳結果
-		//fileReader.readAsBinary(file);
-		fileReader.readAsArrayBuffer(file);
-		//fileReader.readAsText(file,'UTF-8');
 	}
-}
 </script>
 
 
