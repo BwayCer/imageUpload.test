@@ -1,38 +1,43 @@
+body {
+    min-width: 500px;
+}
+
 .formBlock {
     display: flex;
     flex-direction: column;
     align-items:center;
 }
-.formBlock_formBtn,
-.formBlock_dropArea,
+.formBlock_pushTool,
 .formBlock_textArea {
     max-width: 100%;
     margin: 20px 0;
     flex: 1;
     box-sizing: border-box;
 }
-.formBlock_formBtn_pikaOver:active,
-.formBlock_dropArea:active,
-.formBlock_formBtn_pikaOver.esFocus,
-.formBlock_dropArea.esFocus {
+
+/* 關注標籤物件 */
+.formBlock_pushTool_pikaOver:active,
+.formBlock_pushTool_dropArea:active,
+.formBlock_pushTool_pikaOver.esFocus,
+.formBlock_pushTool_dropArea.esFocus {
     border-width: 2px;
-    border-color: #66afe9;
+    border-color: #4d90fe;
 }
 
-.formBlock_formBtn {
+.formBlock_pushTool {
     display: flex;
     justify-content: center;
     align-items:center;
 }
-.formBlock_formBtn_lableBtn,
-.formBlock_formBtn_pikaOver {
-    margin: 0 20px;
+.formBlock_pushTool_lableBtn,
+.formBlock_pushTool_pikaOver,
+.formBlock_pushTool_dropArea {
+    margin: 0 10px;
 }
-.formBlock_formBtn_lableBtn {
+.formBlock_pushTool_lableBtn {
     display: block;
-    width: 200px;
+    width: 140px;
     height: 42px;
-    margin: 0;
     padding: 0 16px;
     background: #03a9f4;
     background: linear-gradient(-5deg, #03a9f4, #18beff);
@@ -45,14 +50,14 @@
     font-weight: 400;
     text-align: center;
 }
-.formBlock_formBtn_lableBtn:focus,
-.formBlock_formBtn_lableBtn.esFocus {
+.formBlock_pushTool_lableBtn:focus,
+.formBlock_pushTool_lableBtn.esFocus {
     background: linear-gradient(175deg, #03a9f4, #18beff);
-    border-color: #66afe9;
+    border-color: #4d90fe;
     outline: 0;
     box-shadow: inset 1px 1px 0px 1px rgba(0,0,0,.075);
 }
-.formBlock_formBtn_pikaOver {
+.formBlock_pushTool_pikaOver {
     width: 200px;
     height: 100px;
     background: url("pika.gif") no-repeat 0 0 transparent;
@@ -62,22 +67,21 @@
     border-radius: 7px;
     box-sizing: border-box;
 }
-.formBlock_formBtn_pikaOver > input {
+.formBlock_pushTool_pikaOver > input {
     width: 100%;
     height: 100%;
     opacity: 0;
     cursor: pointer;
 }
-
-.formBlock_dropArea {
-    width: 400px;
-    height: 200px;
+.formBlock_pushTool_dropArea {
+    width: 200px;
+    height: 100px;
     border: 2px dashed gray;
     text-align: center;
 }
 
 .formBlock_textArea {
-    width: 400px;
+    width: 580px;
     height: 300px;
     padding: 4px;
     border: 1px solid #A9A9A9;
@@ -85,7 +89,7 @@
     transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
 }
 .formBlock_textArea.esFocus {
-    border-color: #66afe9;
+    border-color: #4d90fe;
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgba(102,175,233,.6);
 }
 

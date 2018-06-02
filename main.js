@@ -38,8 +38,10 @@ function () {
 
         let helFromBlock = document.querySelector('.formBlock');
         let listener = designateSubElementListener(
-            '.formBlock_formBtn_lableBtn, .formBlock_formBtn_pikaOver,'
-            + ' .formBlock_dropArea, .formBlock_textArea',
+            '.formBlock_pushTool_lableBtn,'
+            + '.formBlock_pushTool_pikaOver,'
+            + '.formBlock_pushTool_dropArea,'
+            + '.formBlock_textArea',
             function (evt) {
                 switch (evt.type) {
                     case 'dragenter':
