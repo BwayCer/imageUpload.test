@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <meta charset="UTF-8">
+    <title>圖片上傳</title>
+    <link rel="stylesheet" href="./main.css">
+
+</head>
+
+<body>
+
+    <div class="formBlock">
+        <div class="formBlock_formBtn">
+            <button class="formBlock_formBtn_lableBtn">
+                <label for="inputSelectFile">選擇圖片</label>
+            </button>
+
+            <div class="formBlock_formBtn_pikaOver">
+                <input type="file" id="inputSelectFile" multiple accept="image/*" onchange="dropHandler(this)" />
+            </div>
+        </div>
+
+        <div class="formBlock_dropArea" ondragover="dragoverHandler(event)" ondrop="dropHandler(event)">
+            拖曳圖片到此處上傳
+            <div id="up_progress"></div>
+        </div>
+
+        <div class="formBlock_textArea">
+            <textarea></textarea>
+        </div>
+    </div>
+
+    <hr />
+    <br />
+
+
+    <div class="previewBlock">
+        <h2>上傳前圖片預覽</h2>
+        <div class="previewBlock_showPhoto"></div>
+    </div>
+
+    <hr />
+    <br />
+
+
+    <div class="uploadBlock">
+        <h2>上傳後圖片</h2>
+        <div class="uploadBlock_showPhoto"></div>
+    </div>
+
+</body>
+
+</html>
