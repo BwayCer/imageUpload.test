@@ -17,45 +17,81 @@ void function (fnReadyAction) {
     }, false);
 }(
 function () {
-    let helTextarea = document.querySelector('.formBlock_textArea > textarea');
+    let helTextDropArea = document.querySelector('.formBlock_textArea');
+    let helTextarea = helTextDropArea.querySelector('textarea');
 
     void function () {
-        function designateSubElementListener(strSelectors, fnListener) {
-            return function (evt) {
-                var idx, len, val;
-                var qsAll = this.querySelectorAll(strSelectors);
-                var designateSubHelList = Array.from(qsAll);
-                var pathList = evt.path;
+        function bindDragEnterLeaveEvent(
+            helMain, fnEnterListener, fnLeaveListener, anyOptions
+        ) {
+            anyOptions = anyOptions || false;
 
-                for (idx = 0, len = pathList.length; idx < len ; idx++) {
-                    val = pathList[idx];
+            var isEnterRect = false;
 
-                    if (val === this || evt.cancelBubble) break;
-                    if (!!~designateSubHelList.indexOf(val)) fnListener.call(val, evt);
-                }
-            };
+            helMain.addEventListener('dragenter', function (evt) {
+                if (isEnterRect) return;
+
+                var clientX = evt.clientX;
+                var clientY = evt.clientY;
+                var boundingClientRect = this.getBoundingClientRect();
+
+                if ( clientX < boundingClientRect.left
+                  || boundingClientRect.right < clientX
+                  || clientY < boundingClientRect.top
+                  || boundingClientRect.bottom < clientY
+                ) return
+
+                isEnterRect = true;
+                fnEnterListener.call(this, evt);
+            }, anyOptions);
+
+            helMain.addEventListener('dragleave', function (evt) {
+                if (!isEnterRect) return;
+
+                var clientX = evt.clientX;
+                var clientY = evt.clientY;
+                var boundingClientRect = this.getBoundingClientRect();
+
+                if ( boundingClientRect.left < clientX
+                  && clientX < boundingClientRect.right
+                  && boundingClientRect.top < clientY
+                  && clientY < boundingClientRect.bottom
+                ) return;
+
+                isEnterRect = false;
+                fnLeaveListener.call(this, evt);
+            }, anyOptions);
+
+            helMain.addEventListener('drop', function (evt) {
+                isEnterRect = false;
+                fnLeaveListener.call(this, evt);
+            }, anyOptions);
         }
 
-        let helFromBlock = document.querySelector('.formBlock');
-        let listener = designateSubElementListener(
+        let idx, len;
+        let helList = document.querySelector('.formBlock').querySelectorAll(
             '.formBlock_pushTool_lableBtn,'
             + '.formBlock_pushTool_pikaOver,'
-            + '.formBlock_pushTool_dropArea,'
             + '.formBlock_textArea',
-            function (evt) {
-                switch (evt.type) {
-                    case 'dragenter':
-                        this.classList.add('esFocus');
-                        break;
-                    case 'dragleave':
-                        this.classList.remove('esFocus');
-                        break;
-                }
-            }
         );
 
-        helFromBlock.addEventListener('dragenter', listener, false);
-        helFromBlock.addEventListener('dragleave', listener, false);
+        function listener(evt) {
+            switch (evt.type) {
+                case 'dragenter':
+                    this.classList.add('onDragDrop');
+                    break;
+                case 'dragleave':
+                    this.classList.remove('onDragDrop');
+                    break;
+                case 'drop':
+                    this.classList.remove('onDragDrop');
+                    break;
+            }
+        }
+
+        for (idx = 0, len = helList.length; idx < len ; idx++) {
+            bindDragEnterLeaveEvent(helList[idx], listener, listener);
+        }
     }();
 
     void function () {
@@ -112,7 +148,6 @@ function () {
     }();
 
     let helPushTool_pikaOver = document.getElementById('inputSelectFile');
-    let helPushTool_dropArea = document.querySelector('.formBlock_pushTool_dropArea');
     let helPreviewPhoto = document.querySelector('.previewBlock_showPhoto');
 
     let selectFile = function () {
@@ -251,8 +286,8 @@ function () {
     }();
 
     helPushTool_pikaOver.addEventListener('change', selectFile.listener, false);
-    helPushTool_dropArea.addEventListener('drop', selectFile.listener, false);
-    helPushTool_dropArea.addEventListener('dragover', function (evt) {
+    helTextDropArea.addEventListener('drop', selectFile.listener, false);
+    helTextDropArea.addEventListener('dragover', function (evt) {
         // drop、dragover 都必須要加！ bug？
         evt.preventDefault();
     }, false);
